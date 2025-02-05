@@ -24,16 +24,16 @@ These stats have to be set by the mod-maker in Unity when configuring the shield
 Download the latest version of the StarWarsShields .dll and set it up in your unity project (WIP)
 
 ## Setting up a basic shield
-
+(WIP)
 
 ## Adding your shield to the mod
-To add the shield to the mod, add it to your manifest the same as you would with any HullComponent.
+To add the shield to the mod, add it to your manifest the same as you would with any HullComponent. (WIP)
 
 ## Adding HKShields as a dependency
 To properly work and avoid any unwanted errors / compatability issues, please do not package the StarWarsShields dll into your own mod - instead, add it as a dependency. 
 (WIP)
 
 # Credit
-Developed by me (Komet07), tested by and co-designed with HelloThere
+Coded by me (Komet07), tested by and co-designed with HelloThere
 
 Many thanks to AGM-114, PuppyFromHell, someusername6, ShadowLotus for their very valuable and much-appreciated help in getting this to properly work!
