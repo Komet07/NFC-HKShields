@@ -119,26 +119,9 @@ namespace StarWarsShields
                     _damage = 0;
                     shieldHullClass.shieldIntegrityCurrent = 0;
 
-                    if (_fragileVFX)
-                    {
-                        GameObject _vfxParent = new GameObject();
+                    PlayVFX(1, _hitInfo.Point); // PLAY VFX NATIVELY
 
-                        _vfxParent.SetActive(true);
-
-                        VisualEffect _vfx2 = _vfxParent.AddComponent<VisualEffect>();
-                        _vfx2.visualEffectAsset = _fragileVFX.visualEffectAsset;
-
-                        _vfxParent.transform.position = _hitInfo.Point;
-                        transform.localScale = shieldHullClass.GetBoundingVolumeSize * (scaleFactor - 0.02f) * 2;
-                        Vector3 _closestPoint = GetComponent<MeshCollider>().ClosestPoint(_hitInfo.Point);
-                        transform.localScale = shieldHullClass.GetBoundingVolumeSize * scaleFactor * 2;
-                        _vfxParent.transform.LookAt(_closestPoint * .99f);
-                        _vfx2.transform.localScale = new Vector3(1, 1, 1);
-
-
-                        _vfx2.Play();
-                        Destroy(_vfxParent, _vfxRepoolDelay);
-                    }
+                    ShieldNetworking.Instance.DoAddVFX(_register, 1, _hitInfo.Point); // ADD VFX TO QUEUE FOR ALL CLIENTS TO PLAY.
                 }
             }
 
@@ -199,6 +182,31 @@ namespace StarWarsShields
                 _vfx2.Play();
 
                 // REMOVE VFX AFTER PLAYING
+                Destroy(_vfxParent, _vfxRepoolDelay);
+            }
+            else if (type == 1) // FRAGILE EVENT VFX
+            {
+                if (_fragileVFX == null)
+                {
+                    return; // CAN'T PLAY VFX, SO RETURN
+                }
+
+                GameObject _vfxParent = new GameObject();
+
+                _vfxParent.SetActive(true);
+
+                VisualEffect _vfx2 = _vfxParent.AddComponent<VisualEffect>();
+                _vfx2.visualEffectAsset = _fragileVFX.visualEffectAsset;
+
+                _vfxParent.transform.position = _pos;
+                transform.localScale = shieldHullClass.GetBoundingVolumeSize * (scaleFactor - 0.02f) * 2;
+                Vector3 _closestPoint = GetComponent<MeshCollider>().ClosestPoint(_pos);
+                transform.localScale = shieldHullClass.GetBoundingVolumeSize * scaleFactor * 2;
+                _vfxParent.transform.LookAt(_closestPoint * .99f);
+                _vfx2.transform.localScale = new Vector3(1, 1, 1);
+
+
+                _vfx2.Play();
                 Destroy(_vfxParent, _vfxRepoolDelay);
             }
         }
