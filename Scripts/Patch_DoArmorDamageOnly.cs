@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using StarWarsShields;
 using UnityEngine;
+using Game;
 
 
 namespace StarWarsShields
@@ -24,13 +25,42 @@ namespace StarWarsShields
             select method).Cast<MethodBase>().First<MethodBase>();
         }
 
-        private static bool Prefix(ShipController __instance, MunitionHitInfo hitInfo, IDamageDealer damager)
+        private static void Postfix(ShipController __instance, MunitionHitInfo hitInfo, IDamageDealer damager, ref HitResult __result)
         {
             foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(__instance.Ship.Hull.AllComponents))
             {
                 ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
                 if (_s.active && _s1.shieldIntegrityCurrent > 0)
                 {
+                    if (damager as IShieldPenMunition != null)
+                    {
+                        __result = HitResult.Overpenetrated;
+                        return;
+                    }
+
+                    break;
+                }
+
+
+            }
+        }
+
+        private static bool Prefix(ShipController __instance, MunitionHitInfo hitInfo, IDamageDealer damager, ref HitResult __result)
+        {
+
+            
+
+            foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(__instance.Ship.Hull.AllComponents))
+            {
+                ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
+                if (_s.active && _s1.shieldIntegrityCurrent > 0)
+                {
+                    if (damager as IShieldPenMunition != null)
+                    {
+                        __result = HitResult.Overpenetrated;
+                        return true;
+                    }
+
                     _s._hitInfo = hitInfo;
                     _s._damager = damager;
 

@@ -101,6 +101,8 @@ namespace StarWarsShields
                 return;
             }
 
+            
+
             // CALCULATE DAMAGE
             float _damage = _damager.ComponentDamage * (1f - shieldHullClass.statShieldResistance.Value);
             // Debug.Log(_isIon ? "IS ION MUNITION" : "ISN'T ION MUNITION");
