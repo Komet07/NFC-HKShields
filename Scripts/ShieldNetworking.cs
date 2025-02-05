@@ -25,6 +25,7 @@ namespace StarWarsShields
         #endregion
 
         private List<object[]> _shieldTable = new List<object[]>();
+        private List<object[]> _shieldVFXQueue = new List<object[]>();
 
         // Start is called before the first frame update
         void Start()
@@ -74,6 +75,7 @@ namespace StarWarsShields
             _shield.shieldHullClass.shieldIntegrityCurrent = _health;
         } */
 
+        // <-- SHIELD REGISTRATION FUNCTIONS -->
         [Server]
         public int DoRegisterShieldTable(string r1, string r2, float _h)
         {
@@ -124,6 +126,7 @@ namespace StarWarsShields
             _shieldTable.Add(entry);
         }
 
+        // <-- SHIELD HEALTH UPDATE FUNCTIONS -->
         [Server]
         public void DoWriteUpdateShieldTable(int i, float _h)
         {
@@ -155,6 +158,56 @@ namespace StarWarsShields
 
             return _h;
 
+        }
+
+        // <-- SHIELD VFX POOL FUNCTIONS -->
+        [Server]
+        public void DoAddVFX(int index, int type, Vector3 _pos)
+        {
+            // COMPILE ENTRY
+            object[] entry = { index, type, _pos};
+
+            RpcAddVFXQueueEntry(entry); // PASS ENTRY ALONG TO RPC
+        }
+
+        [ClientRpc]
+        void RpcAddVFXQueueEntry(object[] entry)
+        {
+            if (isServer) // DO NOT ADD TO QUEUE IF ALREADY HOST - VFX HAS ALREADY PLAYED THERE
+            {
+                return;
+            }
+            _shieldVFXQueue.Add(entry);
+        }
+
+
+        // RETRIEVE ALL VFX COMMANDS IN QUEUE FOR THIS SHIELD
+        public List<object[]> RetrievePool(int register)
+        {
+            List<object[]> _entries = new List<object[]>();
+
+            // RETRIEVE COMMANDS
+            for (int i = 0; i < _shieldVFXQueue.Count; i++)
+            {
+                if ((int)_shieldVFXQueue[i][0] != register)
+                {
+                    continue; // MOVE ON TO NEXT ITEM IF INDEX DOESN'T MATCH
+                }
+
+
+                object[] _entry = { _shieldVFXQueue[i][1], _shieldVFXQueue[i][2] }; // COMPILE ENTRY OUT OF ENTRIES -> REMOVE UNWANTED INDEX
+
+                // ADD TO ENTRIES
+                _entries.Add(_entry);
+
+                // DELETE UNNEEDED ENTRY FROM _shieldVFXQueue, LOWER INDEX BY 1 TO NOT SKIP OVER OTHER ELEMENTS
+                _shieldVFXQueue.Remove(_shieldVFXQueue[i]);
+                i--;
+
+            }
+
+            // RETURN COMPILED LIST
+            return _entries;
         }
     }
 }

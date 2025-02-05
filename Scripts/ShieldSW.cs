@@ -93,13 +93,14 @@ namespace StarWarsShields
         public void DoDamage()
         {
 
-
+            // STOP FUNCTION IF IMPORTANT DATA IS MISSING
             if (_damager == null || _hitInfo == null /* || !isServer */)
             {
 
                 return;
             }
 
+            // CALCULATE DAMAGE
             float _damage = _damager.ComponentDamage * (1f - shieldHullClass.statShieldResistance.Value);
             // Debug.Log(_isIon ? "IS ION MUNITION" : "ISN'T ION MUNITION");
             _damage *= (_isIon) ? _ionMulti : 1f;
@@ -117,7 +118,7 @@ namespace StarWarsShields
                     _damage = 0;
                     shieldHullClass.shieldIntegrityCurrent = 0;
 
-                    if (!_fragileVFX)
+                    if (_fragileVFX)
                     {
                         GameObject _vfxParent = new GameObject();
 
@@ -140,10 +141,14 @@ namespace StarWarsShields
                 }
             }
 
+            // APPLY DAMAGE
             shieldHullClass.shieldIntegrityCurrent = (shieldHullClass.shieldIntegrityCurrent > 0) ? (shieldHullClass.shieldIntegrityCurrent - _damage) : shieldHullClass.shieldIntegrityCurrent;
 
             shieldHullClass.shieldIntegrityCurrent = Mathf.Clamp(shieldHullClass.shieldIntegrityCurrent, 0, shieldHullClass.statShieldIntegrityMax.Value);
             tPassedSinceLastDamage = 0; // Reset Time Counter, stop Recharge
+
+
+            // DISABLE COLLIDER IF HEALTH IS 0
             if (GetComponent<MeshCollider>().enabled && shieldHullClass.shieldIntegrityCurrent <= 0)
             {
                 GetComponent<MeshCollider>().enabled = false;
@@ -153,26 +158,46 @@ namespace StarWarsShields
             // RUNS SHIELD VFX
             if (_vfx != null /* && _pooledObjects.Count != 0 */)
             {
-                GameObject _vfxParent = new GameObject();
+                PlayVFX(0, _hitInfo.Point); // PLAY VFX NATIVELY
 
-                /* if (_vfxParent == null)
+                ShieldNetworking.Instance.DoAddVFX(_register, 0, _hitInfo.Point); // ADD VFX TO QUEUE FOR ALL CLIENTS TO PLAY.
+            }
+        }
+
+        // SHELL FOR RUNNING VFX
+        public void PlayVFX(int type, Vector3 _pos)
+        {
+            if (type == 0) // RUN BASE HIT VFX
+            {
+
+                if (_vfx == null)
                 {
-                    return;
-                } */
+                    return; // CAN'T PLAY VFX IF VFX ISN'T THERE
+                }
+
+                // SETUP VFX OBJECT
+                GameObject _vfxParent = new GameObject();
 
                 _vfxParent.SetActive(true);
 
+                // GRAB VFX ASSET
                 VisualEffect _vfx2 = _vfxParent.AddComponent<VisualEffect>();
                 _vfx2.visualEffectAsset = _vfx.visualEffectAsset;
 
-                _vfxParent.transform.position = _hitInfo.Point;
+                _vfxParent.transform.position = _pos;
+
+
+                // DETERMINE VIEW DIRECTION THROUGH SHENANIGANS
                 transform.localScale = shieldHullClass.GetBoundingVolumeSize * (scaleFactor - 0.02f) * 2;
-                Vector3 _closestPoint = GetComponent<MeshCollider>().ClosestPoint(_hitInfo.Point);
+                Vector3 _closestPoint = GetComponent<MeshCollider>().ClosestPoint(_pos);
                 transform.localScale = shieldHullClass.GetBoundingVolumeSize * scaleFactor * 2;
                 _vfxParent.transform.LookAt(_closestPoint * .99f);
                 _vfx2.transform.localScale = new Vector3(1, 1, 1);
 
+                // PLAY VFX
                 _vfx2.Play();
+
+                // REMOVE VFX AFTER PLAYING
                 Destroy(_vfxParent, _vfxRepoolDelay);
             }
         }
@@ -330,35 +355,29 @@ namespace StarWarsShields
                 // UPDATE / READ IF REGISTERED
                 if (_register >= 0 && ShieldNetworking.Instance != null)
                 {
+                    // <- SHIELD HEALTH NETWORKING ->
                     // UPDATE VALUE
                     ShieldNetworking.Instance.DoWriteUpdateShieldTable(_register, shieldHullClass.shieldIntegrityCurrent);
 
                     // READ VALUE
                     shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
-                }
 
-                /* if (ShieldNetworking.Instance != null)
-                {
-                    ShieldNetworking.Instance.DoUpdateShieldHealth(this);
+
+                    // <- SHIELD VFX NETWORKING ->
+                    // RETRIEVE ITEMS IN POOL AND PLAY
+                    foreach (object[] _entry in ShieldNetworking.Instance.RetrievePool(_register))
+                    {
+                        PlayVFX((int)_entry[0], (Vector3)_entry[1]);
+                    }
+
                 }
                 else
                 {
-                    Debug.Log("SHIELD NETWORKING NOT FOUND (HK SHIELDS) !");
-                } */
+                    Debug.Log("SHIELD NOT YET REGISTERED (HK SHIELDS) !");
+                }
             }
 
 
-            /* if (isServer)
-            {
-                _cSH = shieldHullClass.shieldIntegrityCurrent;
-
-            }
-            else
-            {
-                shieldHullClass.shieldIntegrityCurrent = _cSH;
-
-                Debug.Log(_cSH);
-            }*/
 
             
             
