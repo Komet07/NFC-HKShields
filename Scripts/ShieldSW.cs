@@ -85,7 +85,8 @@ namespace StarWarsShields
         public float _ionMulti = 1f;
 
         // <- NETWORKING REGISTRATION ->
-        private int _register = -1; // -1 = NO REGISTER
+        [HideInInspector]
+        public int _register = -1; // -1 = NO REGISTER
 
 
 
@@ -345,7 +346,7 @@ namespace StarWarsShields
                 // CHECK IF REGISTERED YET, IF NOT AND INSTANCE EXISTS, REGISTER
                 if (_register == -1 && ShieldNetworking.Instance != null)
                 {
-                    _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent);
+                    _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent, shieldHullClass.GetActivityStatus());
                     if (_register == -1)
                     {
                         _register = ShieldNetworking.Instance.ReturnRegister(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key);
@@ -357,7 +358,7 @@ namespace StarWarsShields
                 {
                     // <- SHIELD HEALTH NETWORKING ->
                     // UPDATE VALUE
-                    ShieldNetworking.Instance.DoWriteUpdateShieldTable(_register, shieldHullClass.shieldIntegrityCurrent);
+                    ShieldNetworking.Instance.DoWriteUpdateShieldTable(_register, shieldHullClass.shieldIntegrityCurrent, shieldHullClass.GetActivityStatus());
 
                     // READ VALUE
                     shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);

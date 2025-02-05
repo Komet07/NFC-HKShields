@@ -24,11 +24,42 @@ namespace StarWarsShields
 
         ModUtil _m = new ModUtil();
 
+        // INDEX SHIELD NETWORKING WITH REGISTER
+        private int _register = -1;
+
         public void Update()
         {
             float _val = _s.shieldHullClass.shieldIntegrityCurrent / _s.shieldHullClass.statShieldIntegrityMax.Value;
-            UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + _s.shieldHullClass.shieldIntegrityCurrent + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)");
-            
+            ComponentActivity _a = ComponentActivity.Active;
+            string _tActivity = "";
+
+            if (_register != -1 && ShieldNetworking.Instance != null)
+            {
+                _a = ShieldNetworking.Instance.activityValue(_register);
+            }
+
+            switch (_a)
+            {
+                case ComponentActivity.MissingResource:
+                    _tActivity = "<color=red>NO POWER</color>";
+                    break;
+                case ComponentActivity.Destroyed:
+                    _tActivity = "<color=red>DESTROYED</color>";
+                    break;
+                case ComponentActivity.Disabled:
+                    _tActivity = "<color=red>DISABLED</color>";
+                    break;
+                default:
+                    _tActivity = "";
+                    break;
+            }
+
+            UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + _s.shieldHullClass.shieldIntegrityCurrent + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
+
+            if (_register == -1 && _s._register != -1)
+            {
+                _register = _s._register;
+            }
 
             if (_iconImage != null)
             {

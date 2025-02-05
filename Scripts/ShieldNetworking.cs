@@ -4,6 +4,7 @@ using UnityEngine;
 
 using Mirror;
 using Networking;
+using Ships;
 
 namespace StarWarsShields
 {
@@ -77,7 +78,7 @@ namespace StarWarsShields
 
         // <-- SHIELD REGISTRATION FUNCTIONS -->
         [Server]
-        public int DoRegisterShieldTable(string r1, string r2, float _h)
+        public int DoRegisterShieldTable(string r1, string r2, float _h, ComponentActivity _activity)
         {
             int index = -1;
 
@@ -93,7 +94,7 @@ namespace StarWarsShields
             // -> DOESN'T EXIST YET, SO CREATE NEW ENTRY
             index = _shieldTable.Count; // SINCE NEW ENTRY IS AT END OF LIST, RETURN LIST COUNT SIZE.
 
-            object[] _a = {r1, r2, _h};
+            object[] _a = {r1, r2, _h, _activity};
 
             _shieldTable.Add(_a);
 
@@ -128,21 +129,23 @@ namespace StarWarsShields
 
         // <-- SHIELD HEALTH UPDATE FUNCTIONS -->
         [Server]
-        public void DoWriteUpdateShieldTable(int i, float _h)
+        public void DoWriteUpdateShieldTable(int i, float _h, ComponentActivity _a)
         {
             // UPDATE VALUE
             _shieldTable[i][2] = _h;
+            _shieldTable[i][3] = _a;
 
             // START RPC
-            RpcUpdateShieldTable(i, _h);
+            RpcUpdateShieldTable(i, _h, _a);
         }
 
 
         [ClientRpc]
-        void RpcUpdateShieldTable(int i, float _h)
+        void RpcUpdateShieldTable(int i, float _h, ComponentActivity _a)
         {
             // UPDATE VALUE
             _shieldTable[i][2] = _h;
+            _shieldTable[i][3] = _a;
         }
 
         // RETRIEVE HEALTH VALUE
@@ -153,11 +156,25 @@ namespace StarWarsShields
             // CHECK IF INDEX IS WITHIN BOUNDS
             if (index >= 0 && index < _shieldTable.Count)
             {
-                return (float)_shieldTable[index][2];
+                return (float)_shieldTable[index][2]; // RETRIEVE VALUE
             }
 
             return _h;
 
+        }
+
+        // RETRIEVE ACTIVITY VALUE
+        public ComponentActivity activityValue(int index)
+        {
+            ComponentActivity _a = ComponentActivity.Active;
+
+            // CHECK IF INDEX IS WITHIN BOUNDS
+            if (index >= 0 && index < _shieldTable.Count)
+            {
+                return (ComponentActivity)_shieldTable[index][3]; // RETRIEVE VALUE
+            }
+
+            return _a;
         }
 
         // <-- SHIELD VFX POOL FUNCTIONS -->
