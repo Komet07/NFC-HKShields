@@ -82,6 +82,8 @@ namespace StarWarsShields
         {
             int index = -1;
 
+            Debug.Log("HT - THIS SHOULD BE THE HOST (HK SHIELDS)");
+
             // CHECK IF ENTRY EXISTS ALREADY
             for (int i = 0; i < _shieldTable.Count; i++)
             {
@@ -131,6 +133,12 @@ namespace StarWarsShields
         [Server]
         public void DoWriteUpdateShieldTable(int i, float _h, ComponentActivity _a)
         {
+
+            if (!isServer) // FAILSAFE FOR IF TRIGGERED AS CLIENT!
+            {
+                return;
+            }
+
             // UPDATE VALUE
             _shieldTable[i][2] = _h;
             _shieldTable[i][3] = _a;

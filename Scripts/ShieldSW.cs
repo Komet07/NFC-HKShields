@@ -69,6 +69,8 @@ namespace StarWarsShields
 
         public float tPassedSinceLastDamage = 0;
 
+        RateLimitedLogger dA = new RateLimitedLogger(1);
+
         [NonSerialized]
         public MunitionHitInfo _hitInfo;
 
@@ -278,10 +280,6 @@ namespace StarWarsShields
             Debug.Log("B");
         } */
 
-
-        // THE MAIN GOAL WITH THE SYNCING IS JUST TO SYNC _cSH
-        // SO THAT THE SERVER/HOST INSTANCE CAN WRITE ON IT AND EVERYTHING ELSE CAN READ OFF OF IT FOR THEIR SHIELD VALUES,
-        // BECAUSE ATM ONLY THE HOST CAN SEE THE CORRECT SHIELD HEALTH VALUES.
         void Update()
         {
             
@@ -353,14 +351,21 @@ namespace StarWarsShields
                 // Scale Scaler
                 transform.localScale = active ? (!scaleUniformly) ? shieldHullClass.GetBoundingVolumeSize * scaleFactor * 2 : shieldHullClass.GetMaxBoundingVolumeSize * scaleFactor * 2 : new Vector3(1, 1, 1);
 
+                
+
                 // CHECK IF REGISTERED YET, IF NOT AND INSTANCE EXISTS, REGISTER
                 if (_register == -1 && ShieldNetworking.Instance != null)
                 {
+                    Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
                     _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent, shieldHullClass.GetActivityStatus());
                     if (_register == -1)
                     {
                         _register = ShieldNetworking.Instance.ReturnRegister(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key);
+                        Debug.Log("REGISTER PROCESS B - (HK SHIELDS) ");
                     }
+
+                    Debug.Log("REGISTER VALUE: (HK SHIELDS) " + _register);
+
                 }
 
                 // UPDATE / READ IF REGISTERED
@@ -372,7 +377,8 @@ namespace StarWarsShields
 
                     // READ VALUE
                     shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
-
+                    dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
+                    
 
                     // <- SHIELD VFX NETWORKING ->
                     // RETRIEVE ITEMS IN POOL AND PLAY
@@ -384,7 +390,7 @@ namespace StarWarsShields
                 }
                 else
                 {
-                    Debug.Log("SHIELD NOT YET REGISTERED (HK SHIELDS) !");
+                    dA.LogLimited("SHIELD NOT YET REGISTERED (HK SHIELDS) !");
                 }
             }
 

@@ -105,7 +105,15 @@ namespace StarWarsShields
             if (this._baseRpcProvider.IsHost && NetworkServer.active && ShieldNetworking.Instance == null)
             {
                 var shield = Instantiate(ModUtil._shieldNetworkingPrefab);
+
+                if (!_baseRpcProvider.IsHost)
+                {
+                    return;
+                }
+
                 NetworkServer.Spawn(shield.gameObject);
+                
+                
 
                 Debug.Log("SHIELD SUCCESSFULLY SPAWNED - KOMET");
             }

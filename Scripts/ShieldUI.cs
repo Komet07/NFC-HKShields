@@ -24,6 +24,9 @@ namespace StarWarsShields
 
         ModUtil _m = new ModUtil();
 
+        RateLimitedLogger dA = new RateLimitedLogger(1);
+
+
         // INDEX SHIELD NETWORKING WITH REGISTER
         private int _register = -1;
 
@@ -54,7 +57,9 @@ namespace StarWarsShields
                     break;
             }
 
-            UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + _s.shieldHullClass.shieldIntegrityCurrent + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
+            dA.LogLimited("(HK SHIELDS) CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
+
+            UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + ShieldNetworking.Instance.healthValue(_register) + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
 
             if (_register == -1 && _s._register != -1)
             {
@@ -87,6 +92,19 @@ namespace StarWarsShields
                 else
                 {
                     _iconImage.color = GameColors.Green;
+                }
+
+                switch (_a)
+                {
+                    case ComponentActivity.MissingResource:
+                        _iconImage.color = GameColors.Purple;
+                        break;
+                    case ComponentActivity.Destroyed:
+                        _iconImage.color = new Color(50,50,50);
+                        break;
+                    case ComponentActivity.Disabled:
+                        _iconImage.color = new Color(75, 0, 0);
+                        break;
                 }
             }
             else if (_s._shieldIcon != null)
