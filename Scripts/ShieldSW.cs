@@ -91,6 +91,12 @@ namespace StarWarsShields
         [HideInInspector]
         public int _register = -1; // -1 = NO REGISTER
 
+        // CHECK IF COLLISION HAPPENS WITH SHIELD
+        public void OnCollisionEnter(Collision collision)
+        {
+            Debug.Log("(HK SHIELDS) SHIELD HAS BEEN IMPACTED BY OBJECT!");
+            Debug.Log("(HK SHIELDS) NAME OF COLLIDING OBJECT: " + collision.gameObject.name);
+        }
 
 
         // FUNCTION THAT APPLIES DAMAGE TO THE SHIELD

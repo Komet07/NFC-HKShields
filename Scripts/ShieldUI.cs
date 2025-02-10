@@ -26,12 +26,25 @@ namespace StarWarsShields
 
         // RateLimitedLogger dA = new RateLimitedLogger(1);
 
+        public Color[] _shieldColorLibrary = null;
+
 
         // INDEX SHIELD NETWORKING WITH REGISTER
         private int _register = -1;
 
         public void FixedUpdate()
         {
+
+            if (_s == null)
+            {
+                return;
+            }
+
+            if (_shieldColorLibrary == null)
+            {
+                _shieldColorLibrary = new Color[] { _s.shieldHullClass.ColorNominal, _s.shieldHullClass.ColorLightDamage, _s.shieldHullClass.ColorModerateDamage, _s.shieldHullClass.ColorHeavyDamage, _s.shieldHullClass.ColorVeryHeavyDamage, _s.shieldHullClass.ColorNoHealth, _s.shieldHullClass.ColorDisabled, _s.shieldHullClass.ColorDestroyed };
+            }
+
             float _val = _s.shieldHullClass.shieldIntegrityCurrent / _s.shieldHullClass.statShieldIntegrityMax.Value;
             ComponentActivity _a = ComponentActivity.Active;
             string _tActivity = "";
@@ -71,27 +84,27 @@ namespace StarWarsShields
 
                 if (_s.shieldHullClass.shieldIntegrityCurrent == 0)
                 {
-                    _iconImage.color = new Color(150, 0, 0);
+                    _iconImage.color = _shieldColorLibrary[5];
                 }
                 else if (_val <= .1f)
                 {
-                    _iconImage.color = new Color(180, 0, 0);
+                    _iconImage.color = _shieldColorLibrary[4];
                 }
                 else if (_val <= .25f)
                 {
-                    _iconImage.color = GameColors.Red;
+                    _iconImage.color = _shieldColorLibrary[3];
                 }
                 else if (_val <= .5f)
                 {
-                    _iconImage.color = GameColors.Orange;
+                    _iconImage.color = _shieldColorLibrary[2];
                 }
                 else if (_val <= .75f)
                 {
-                    _iconImage.color = GameColors.Yellow;
+                    _iconImage.color = _shieldColorLibrary[1];
                 }
                 else
                 {
-                    _iconImage.color = GameColors.Green;
+                    _iconImage.color = _shieldColorLibrary[0];
                 }
 
                 switch (_a)
@@ -100,10 +113,10 @@ namespace StarWarsShields
                         _iconImage.color = GameColors.Purple;
                         break; */
                     case ComponentActivity.Destroyed:
-                        _iconImage.color = new Color(50,50,50);
+                        _iconImage.color = _shieldColorLibrary[7];
                         break;
                     case ComponentActivity.Disabled:
-                        _iconImage.color = new Color(75, 0, 0);
+                        _iconImage.color = _shieldColorLibrary[6];
                         break;
                 }
             }

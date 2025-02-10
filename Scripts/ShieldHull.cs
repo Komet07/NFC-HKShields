@@ -86,6 +86,24 @@ namespace StarWarsShields
         [NonSerialized, ShipStat("shield-FragilityThreshold", "Shield Fragility Damage Threshold", "HP", InitializeFrom = "_fragileDamageThreshold", MinValue = 0f)]
         public StatValue statFragilityDamageThreshold;
 
+        [Header("Shield Color Library")]
+        [Tooltip("IF HEALTH > 75%")]
+        public Color ColorNominal = new Color(0.23f, 0.781f, 0.117f);
+        [Tooltip("IF HEALTH > 50%")]
+        public Color ColorLightDamage = new Color(0.824f, 0.816f, 0.121f);
+        [Tooltip("IF HEALTH > 25%")]
+        public Color ColorModerateDamage = new Color(0.968f, 0.396f, 0.105f);
+        [Tooltip("IF HEALTH > 10%")]
+        public Color ColorHeavyDamage = new Color(0.929f, 0.128f, 0.113f);
+        [Tooltip("IF HEALTH > 0%")]
+        public Color ColorVeryHeavyDamage = new Color(0.7f, 0f, 0f);
+        [Tooltip("IF NO HEALTH LEFT")]
+        public Color ColorNoHealth = new Color(0.6f, 0f, 0f);
+        [Tooltip("IF SHIELD COMPONENT DISABLED")]
+        public Color ColorDisabled = new Color(0.275f, 0f, 0f);
+        [Tooltip("IF SHIELD COMPONENT DESTROYED")]
+        public Color ColorDestroyed = new Color(0.2f, 0.2f, 0.2f);
+
         //[SerializeField, Header("Shield Initialization")]
         // public ShieldNetworking _shieldNetworkingPrefab;
 
