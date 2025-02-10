@@ -98,6 +98,16 @@ namespace StarWarsShields
                     break;
             }
 
+            if (_s.shieldHullClass.shieldIntegrityCurrent == 0 && _tActivity == "")
+            {
+                _tActivity = "<color=red>NO HEALTH</color>";
+
+            }
+            else if (_s.DownBecauseOfCarrierOps && _tActivity == "")
+            {
+                _tActivity = "<color=red>CARRIER OPERATIONS</color>";
+            }
+
             // dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
 
             UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + ShieldNetworking.Instance.healthValue(_register) + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
@@ -113,6 +123,7 @@ namespace StarWarsShields
                 if (_s.shieldHullClass.shieldIntegrityCurrent == 0)
                 {
                     _iconImage.color = _shieldColorLibrary[5];
+
                 }
                 else if (_val <= .1f)
                 {
@@ -133,6 +144,13 @@ namespace StarWarsShields
                 else
                 {
                     _iconImage.color = _shieldColorLibrary[0];
+                }
+
+
+                // DOWN BECAUSE OF CARRIER OPERATIONS
+                if (_s.shieldHullClass.shieldIntegrityCurrent != 0 && _s.DownBecauseOfCarrierOps)
+                {
+                    _iconImage.color = _shieldColorLibrary[6];
                 }
 
                 switch (_a)
