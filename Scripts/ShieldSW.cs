@@ -314,20 +314,6 @@ namespace StarWarsShields
             return false; // DO NOT LOWER SHIELD
         }
 
-        public bool DownBecauseOfCarrierOps
-        {
-            get
-            {
-
-                if (csdd_counter > 0f)
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        }
-
         void Update()
         {
             

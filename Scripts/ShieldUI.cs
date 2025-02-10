@@ -103,10 +103,6 @@ namespace StarWarsShields
                 _tActivity = "<color=red>NO HEALTH</color>";
 
             }
-            else if (_s.DownBecauseOfCarrierOps && _tActivity == "")
-            {
-                _tActivity = "<color=red>CARRIER OPERATIONS</color>";
-            }
 
             // dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
 
@@ -147,11 +143,7 @@ namespace StarWarsShields
                 }
 
 
-                // DOWN BECAUSE OF CARRIER OPERATIONS
-                if (_s.shieldHullClass.shieldIntegrityCurrent != 0 && _s.DownBecauseOfCarrierOps)
-                {
-                    _iconImage.color = _shieldColorLibrary[6];
-                }
+               
 
                 switch (_a)
                 {
