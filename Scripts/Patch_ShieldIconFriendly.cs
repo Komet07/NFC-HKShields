@@ -22,7 +22,7 @@ namespace StarWarsShields
         [HarmonyPatch("SetShip")]
         static void PostfixSetShip(ref FriendlyShipItem __instance, ShipController ship)
         {
-            Debug.Log("HARMONY PATCH IS RUNNING!");
+            Debug.Log("(HK SHIELDS) HARMONY PATCH IS RUNNING!");
             bool _a = false;
 
             ShieldSW shield = null;
@@ -32,9 +32,12 @@ namespace StarWarsShields
                 _a = true;
                 ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
                 shield = _s;
-                continue;
+                Debug.Log("(HK SHIELDS - SHIELD UI INITIALIZATION) FOUND SHIELD : " + ship.Ship.ShipDisplayName + " - AT SOCKET: " + _s1.Socket.Key);
+                break;
             }
-            Debug.Log("PATCH FLAG 1 : " + _a);
+
+            Debug.Log("(HK SHIELDS) PATCH FLAG 1 : " + _a);
+
             if (_a)
             {
 

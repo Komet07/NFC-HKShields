@@ -30,7 +30,7 @@ namespace StarWarsShields
         // INDEX SHIELD NETWORKING WITH REGISTER
         private int _register = -1;
 
-        public void Update()
+        public void FixedUpdate()
         {
             float _val = _s.shieldHullClass.shieldIntegrityCurrent / _s.shieldHullClass.statShieldIntegrityMax.Value;
             ComponentActivity _a = ComponentActivity.Active;
@@ -38,14 +38,14 @@ namespace StarWarsShields
 
             if (_register != -1 && ShieldNetworking.Instance != null)
             {
-                _a = ShieldNetworking.Instance.activityValue(_register);
+                _a = _s.shieldHullClass.GetActivityStatus();
             }
 
             switch (_a)
             {
-                case ComponentActivity.MissingResource:
+                /* case ComponentActivity.MissingResource:
                     _tActivity = "<color=red>NO POWER</color>";
-                    break;
+                    break; */
                 case ComponentActivity.Destroyed:
                     _tActivity = "<color=red>DESTROYED</color>";
                     break;
@@ -57,7 +57,7 @@ namespace StarWarsShields
                     break;
             }
 
-            dA.LogLimited("(HK SHIELDS) CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
+            dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
 
             UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + ShieldNetworking.Instance.healthValue(_register) + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
 
@@ -96,9 +96,9 @@ namespace StarWarsShields
 
                 switch (_a)
                 {
-                    case ComponentActivity.MissingResource:
+                    /* case ComponentActivity.MissingResource:
                         _iconImage.color = GameColors.Purple;
-                        break;
+                        break; */
                     case ComponentActivity.Destroyed:
                         _iconImage.color = new Color(50,50,50);
                         break;
@@ -115,6 +115,7 @@ namespace StarWarsShields
                 _iconImage.sprite = _s._shieldIcon;
                 _graphic = _iconImage;
             }
+
         }
 
         

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.VFX;
 using Mirror;
 
+
 using System.Collections.Generic;
 using System.Collections;
 using Munitions;
@@ -357,7 +358,8 @@ namespace StarWarsShields
                 if (_register == -1 && ShieldNetworking.Instance != null)
                 {
                     Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
-                    _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent, shieldHullClass.GetActivityStatus());
+                    _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent);
+                    ShieldNetworking.Instance.DumpTable();
                     if (_register == -1)
                     {
                         _register = ShieldNetworking.Instance.ReturnRegister(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key);
@@ -373,12 +375,14 @@ namespace StarWarsShields
                 {
                     // <- SHIELD HEALTH NETWORKING ->
                     // UPDATE VALUE
-                    ShieldNetworking.Instance.DoWriteUpdateShieldTable(_register, shieldHullClass.shieldIntegrityCurrent, shieldHullClass.GetActivityStatus());
+                    ShieldNetworking.Instance.DoWriteUpdateShieldTable(_register, shieldHullClass.shieldIntegrityCurrent);
 
                     // READ VALUE
-                    shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
-                    dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
-                    
+                    if (ShieldNetworking.Instance.healthValue(_register) >= 0)
+                    {
+                        shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
+                        dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
+                    }
 
                     // <- SHIELD VFX NETWORKING ->
                     // RETRIEVE ITEMS IN POOL AND PLAY

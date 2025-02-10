@@ -180,6 +180,7 @@ namespace StarWarsShields
             if (_shieldNetworkingPrefab != null)
             {
                 NetworkClient.RegisterPrefab(_shieldNetworkingPrefab.gameObject, SpawnShield, UnspawnShield);
+                NetworkManager.singleton.spawnPrefabs.Add(_shieldNetworkingPrefab.gameObject);
                 Debug.Log("SCRIPT FOUND (HK SHIELDS) !!!");
             }
             else

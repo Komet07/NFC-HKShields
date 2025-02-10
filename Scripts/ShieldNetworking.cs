@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using Mirror;
+using Mirror.RemoteCalls;
 using Networking;
 using Ships;
 
@@ -76,11 +77,27 @@ namespace StarWarsShields
             _shield.shieldHullClass.shieldIntegrityCurrent = _health;
         } */
 
+        static ShieldNetworking()
+        {
+            // REGISTER NEEDED RPCS
+            RemoteCallHelper.RegisterRpcDelegate(typeof(ShieldNetworking), "RpcAddShieldTableEntry", new CmdDelegate(IRpcAddShieldTableEntry)); // ADD TABLE ENTRY TO SHIELD
+            RemoteCallHelper.RegisterRpcDelegate(typeof(ShieldNetworking), "RpcUpdateShieldTable", new CmdDelegate(IRpcUpdateShieldTable)); // UPDATE SHIELD HEALTH
+        }
+            
+        // <-- GENERAL NETWORKING FUNCTIONS -->
+        
+
         // <-- SHIELD REGISTRATION FUNCTIONS -->
         [Server]
-        public int DoRegisterShieldTable(string r1, string r2, float _h, ComponentActivity _activity)
+        public int DoRegisterShieldTable(string r1, string r2, float _h)
         {
             int index = -1;
+
+            if (!isServer) // FAILSAFE FOR IF TRIGGERED AS CLIENT!
+            {
+                Debug.Log("HT - THIS SHOULD BE THE CLIENT (HK SHIELDS)");
+                return index;
+            }
 
             Debug.Log("HT - THIS SHOULD BE THE HOST (HK SHIELDS)");
 
@@ -96,9 +113,17 @@ namespace StarWarsShields
             // -> DOESN'T EXIST YET, SO CREATE NEW ENTRY
             index = _shieldTable.Count; // SINCE NEW ENTRY IS AT END OF LIST, RETURN LIST COUNT SIZE.
 
-            object[] _a = {r1, r2, _h, _activity};
+            object[] _a = {r1, r2, _h};
 
-            _shieldTable.Add(_a);
+            if (isServerOnly)
+            {
+                _shieldTable.Add(_a);
+            }
+
+            if (!NetworkClient.active)
+            {
+                return index;
+            }
 
             // TELL RPC TO ALSO ASSIGN NEW ENTRY
             RpcAddShieldTableEntry(_a);
@@ -123,15 +148,32 @@ namespace StarWarsShields
             return index;
         }
 
-        [ClientRpc] // ADD NEW ENTRY TO Shield Table
-        void RpcAddShieldTableEntry(object[] entry)
+        public void DumpTable()
         {
+            for (int i = 0; i < _shieldTable.Count; i++)
+            {
+                Debug.Log("(HK SHIELDS) SHIELD TABLE ENTRY " + i + " - IDENT. 1: " + _shieldTable[i][0] + " - IDENT. 2: " + _shieldTable[i][1] + " - HEALTH: " + _shieldTable[i][2]);
+            }
+
+            if (_shieldTable.Count == 0)
+            {
+                Debug.Log("(HK SHIELDS) SHIELD TABLE IS EMPTY");
+            }
+        }
+
+        // ADD NEW ENTRY TO Shield Table
+        void DoRpcAddShieldTableEntry(object[] entry)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
             _shieldTable.Add(entry);
         }
 
         // <-- SHIELD HEALTH UPDATE FUNCTIONS -->
         [Server]
-        public void DoWriteUpdateShieldTable(int i, float _h, ComponentActivity _a)
+        public void DoWriteUpdateShieldTable(int i, float _h)
         {
 
             if (!isServer) // FAILSAFE FOR IF TRIGGERED AS CLIENT!
@@ -139,32 +181,138 @@ namespace StarWarsShields
                 return;
             }
 
-            // UPDATE VALUE
-            _shieldTable[i][2] = _h;
-            _shieldTable[i][3] = _a;
+            if (i >= 0 && i < _shieldTable.Count)
+            {
+                // UPDATE VALUE
+                _shieldTable[i][2] = _h;
+            }
+            else
+            {
+                Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE! (HOST)");
+            }
+
+            if (!NetworkClient.active)
+            {
+                return;
+            }
 
             // START RPC
-            RpcUpdateShieldTable(i, _h, _a);
+            RpcUpdateShieldTable(i, _h);
         }
 
-
-        [ClientRpc]
-        void RpcUpdateShieldTable(int i, float _h, ComponentActivity _a)
+        [ClientRpc(includeOwner = false)]
+        private void RpcUpdateShieldTable(int index, float health)
         {
-            // UPDATE VALUE
-            _shieldTable[i][2] = _h;
-            _shieldTable[i][3] = _a;
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            // MAKE NEW WRITER
+            PooledNetworkWriter writer = NetworkWriterPool.GetWriter();
+
+            // WRITE NETWORKED VALUES
+            writer.WriteInt(index); // TABLE ENTRY
+            writer.WriteFloat(health); // SHIELD HEALTH
+
+            // SEND RPC
+            SendRPCInternal(typeof(ShieldNetworking), "RpcUpdateShieldTable", writer, 0, false);
+
+            // RECYCLE WRITER
+            NetworkWriterPool.Recycle(writer);
+        }
+
+        [ClientRpc(includeOwner = false)]
+        private void RpcAddShieldTableEntry(object[] entry)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            // MAKE NEW WRITER
+            PooledNetworkWriter writer = NetworkWriterPool.GetWriter();
+
+            // WRITE NETWORKED VALUES
+            writer.WriteString((string)entry[0]); // IDENT A
+            writer.WriteString((string)entry[1]); // IDENT B
+            writer.WriteFloat((float)entry[2]); // HEALTH
+
+            // SEND RPC
+            SendRPCInternal(typeof(ShieldNetworking), "RpcAddShieldTableEntry", writer, 0, false);
+
+            // RECYCLE WRITER
+            NetworkWriterPool.Recycle(writer);
+        }
+
+        protected static void IRpcUpdateShieldTable(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            ((ShieldNetworking)obj).UCRpcUpdateShieldTable(reader.ReadInt(), reader.ReadFloat());
+        }
+
+        protected static void IRpcAddShieldTableEntry(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            ((ShieldNetworking)obj).UCRpcAddShieldTableEntry(reader.ReadString(), reader.ReadString(), reader.ReadFloat());
+        }
+
+        protected void UCRpcUpdateShieldTable(int i, float h)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            DoRpcUpdateShieldTable(i, h);
+        }
+
+        protected void UCRpcAddShieldTableEntry(string a, string b, float h)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            object[] c = { a, b, h };
+
+            DoRpcAddShieldTableEntry(c); // ADD NETWORKED ENTRY
+        }
+
+        void DoRpcUpdateShieldTable(int i, float _h)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            // CHECK IF INDEX EXISTS
+            if (i >= 0 && i < _shieldTable.Count)
+            {
+                // UPDATE VALUE
+                _shieldTable[i][2] = _h;
+            }
+            else
+            {
+                Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE!"); // LOG IF INDEX IS OUT OF BOUNDS OF TABLE
+            }
+
         }
 
         // RETRIEVE HEALTH VALUE
         public float healthValue(int index)
         {
-            float _h = 0;
+            float _h = -1;
 
             // CHECK IF INDEX IS WITHIN BOUNDS
             if (index >= 0 && index < _shieldTable.Count)
             {
                 return (float)_shieldTable[index][2]; // RETRIEVE VALUE
+            }
+            else
+            {
+                Debug.Log("(HK SHIELDS) INDEX " + index + " WAS OUT OF BOUNDS OF SHIELD TABLE!");
             }
 
             return _h;
@@ -172,7 +320,7 @@ namespace StarWarsShields
         }
 
         // RETRIEVE ACTIVITY VALUE
-        public ComponentActivity activityValue(int index)
+        /* public ComponentActivity activityValue(int index)
         {
             ComponentActivity _a = ComponentActivity.Active;
 
@@ -183,7 +331,7 @@ namespace StarWarsShields
             }
 
             return _a;
-        }
+        } */ // OBSOLETE
 
         // <-- SHIELD VFX POOL FUNCTIONS -->
         [Server]
