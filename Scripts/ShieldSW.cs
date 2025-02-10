@@ -64,6 +64,10 @@ namespace StarWarsShields
         [SerializeField]
         protected bool battleshort = false; // Check whether Battleshort is on or not
 
+        [SerializeField]
+        private float CraftShieldDownDelay = 5f; // SHIELD DOWN FOR 5 SECONDS WHILE LAUNCHING OR LANDING CRAFT!
+        private float csdd_counter = 0f;
+
         public bool active = true; // Check whether component is active
 
         public ShieldHull shieldHullClass;
@@ -92,11 +96,11 @@ namespace StarWarsShields
         public int _register = -1; // -1 = NO REGISTER
 
         // CHECK IF COLLISION HAPPENS WITH SHIELD
-        public void OnCollisionEnter(Collision collision)
+        /* public void OnCollisionEnter(Collision collision)
         {
             Debug.Log("(HK SHIELDS) SHIELD HAS BEEN IMPACTED BY OBJECT!");
             Debug.Log("(HK SHIELDS) NAME OF COLLIDING OBJECT: " + collision.gameObject.name);
-        }
+        } */ 
 
 
         // FUNCTION THAT APPLIES DAMAGE TO THE SHIELD
@@ -287,6 +291,29 @@ namespace StarWarsShields
             Debug.Log("B");
         } */
 
+        public bool CarrierOps()
+        {
+            if(!shieldHullClass)
+            {
+                return false;
+            }
+
+            CraftCarrierController CM = shieldHullClass.Socket.MyHull.MyShip.Controller.CraftManager;
+
+            if (CM == null)
+            {
+                return false;
+            }
+
+            if (CM.LaunchingCount > 0 || CM.LandingCount > 0)
+            {
+                return true; // RETURN TRUE IF CRAFT ARE LAUNCHING OR LANDING
+            }
+
+
+            return false; // DO NOT LOWER SHIELD
+        }
+
         void Update()
         {
             
@@ -334,8 +361,9 @@ namespace StarWarsShields
                     shieldHullClass.shieldIntegrityCurrent = Mathf.Round(shieldHullClass.shieldIntegrityCurrent * 20) / 20;
                 }
 
+                csdd_counter = (CarrierOps()) ? CraftShieldDownDelay : Mathf.Clamp((csdd_counter - Time.deltaTime), 0f, CraftShieldDownDelay);
 
-                bool _active = shieldHullClass.shieldIntegrityCurrent > 0 ? true : false;
+                bool _active = shieldHullClass.shieldIntegrityCurrent > 0 ? ((csdd_counter > 0f) ? true : false) : false;
 
 
                 // Disable Shield Scaler & Collider if not active & vice versa

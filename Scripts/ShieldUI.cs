@@ -43,6 +43,34 @@ namespace StarWarsShields
             if (_shieldColorLibrary == null)
             {
                 _shieldColorLibrary = new Color[] { _s.shieldHullClass.ColorNominal, _s.shieldHullClass.ColorLightDamage, _s.shieldHullClass.ColorModerateDamage, _s.shieldHullClass.ColorHeavyDamage, _s.shieldHullClass.ColorVeryHeavyDamage, _s.shieldHullClass.ColorNoHealth, _s.shieldHullClass.ColorDisabled, _s.shieldHullClass.ColorDestroyed };
+
+                // <-- CHECK FOR COLORBLIND ACCESSIBILITY: --> (+ Override if different palette used than regularly)
+                Color[] _standards = new Color[] { new Color(0.23f, 0.781f, 0.117f), new Color(0.824f, 0.816f, 0.121f), new Color(0.968f, 0.396f, 0.105f), new Color(0.929f, 0.128f, 0.113f)};
+
+
+                // <- CHECK: GREEN ->
+                if (GameColors.Green != _standards[0])
+                {
+                    _shieldColorLibrary[0] = GameColors.Green;
+                }
+
+                // <- CHECK: YELLOW ->
+                if (GameColors.Yellow != _standards[1])
+                {
+                    _shieldColorLibrary[1] = GameColors.Yellow;
+                }
+
+                // <- CHECK: ORANGE ->
+                if (GameColors.Orange != _standards[2])
+                {
+                    _shieldColorLibrary[2] = GameColors.Orange;
+                }
+
+                // <- CHECK: RED ->
+                if (GameColors.Red != _standards[3])
+                {
+                    _shieldColorLibrary[3] = GameColors.Red;
+                }
             }
 
             float _val = _s.shieldHullClass.shieldIntegrityCurrent / _s.shieldHullClass.statShieldIntegrityMax.Value;

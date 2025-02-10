@@ -87,7 +87,7 @@ namespace StarWarsShields
         public StatValue statFragilityDamageThreshold;
 
         [Header("Shield Color Library")]
-        [Tooltip("IF HEALTH > 75%")]
+        [Tooltip("IF HEALTH > 75% - QUICK NOTE ABOUT COLORBLIND ACCESSIBILITY: THESE COLORS WILL BE OVERRIDEN IF ANY FORM OF COLORBLIND ACCESSIBILITY IS IN!")]
         public Color ColorNominal = new Color(0.23f, 0.781f, 0.117f);
         [Tooltip("IF HEALTH > 50%")]
         public Color ColorLightDamage = new Color(0.824f, 0.816f, 0.121f);
