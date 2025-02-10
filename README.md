@@ -28,7 +28,7 @@ These stats have to be set by the mod-maker in Unity when configuring the shield
 
 # How to set up (WIP)
 ## Installation
-Download the latest version of the StarWarsShields .dll and include it in your Unity project (the lib folder with the rest of the Neb dlls)
+Download the latest version of the StarWarsShields .dll and include it in your Unity project (the lib folder with the rest of the Neb dlls). You DO NOT NEED the rest of the source code for this, ONLY the dll!
 
 ## Setting up a basic shield
 
@@ -38,23 +38,26 @@ To set up a shield, you basically need two scripts:
 - ShieldSW.cs, a script which actually runs the shield and contains some extra options needed to get the shield to work.
 
 **Step 2: Setting up ShieldHull.cs**
-Set up your ShieldHull's stats the same you would for any other HullComponent. You can then find the Shield's Stats in the Bottom of the Inspector for the script. 
+Set up your ShieldHull's stats the same you would for any other HullComponent. You can then find the Shield's Stats in the Bottom of the Inspector for the script.
 
 **Step 3: Setting up ShieldSW.cs**
-Once you've added ShieldSW, you'll also see a MeshComponent which'll automatically be added. This is where you put the mesh for your shield, which'll automatically later be stretched to fit the ship it's on. We recommend a low-vertex sphere (NOTE: Should ideally be <256 tris to prevent Unity from complaining about it). 
+Once you've added ShieldSW, you'll also see a MeshComponent which'll automatically be added. This is where you put the mesh for your shield, which'll automatically later be stretched to fit the ship it's on. We recommend a low-vertex sphere (NOTE: Should ideally be <256 tris to prevent Unity from complaining about it). You also need to set the Collider to Convex!
 
 Now, you also have some options that you need to set here:
 - Scale Factor (under Collider Stats) should be pre-set to 1.25 - this is a value we've found works well to envelop most ships pretty well.
 - Shield Icon: This is required for the UI - a basic template Icon has been provided in the #mod-showcase post, but any icon will do. We recommend a small resolution - we use a 72x72px sprite.
 - VFX: This is optional, but the VFX is what'll play when your shield gets hit (the basic _VFX stat) or when the fragility stuff happens (_fragileVFX)
 
-You can pretty much ignore everything else in ShieldSW.cs!
+You can pretty much ignore everything else in ShieldSW.cs! Particularly, everything under the header of 'Runtime Stats' should be ignored!
 
 ## Adding your shield to the mod
 To add the shield to the mod, add it to your manifest and asset bundle the same as you would with any HullComponent.
 
 ## Adding HKShields as a dependency
 To properly work and avoid any unwanted errors / compatability issues, please do not package the StarWarsShields dll into your own mod - instead, add it as a dependency!
+
+**If you don't add the dependency, the game won't recognize the shield!**
+
 
 # Credit
 Coded by me (Komet07), tested by and co-designed with HelloThere
