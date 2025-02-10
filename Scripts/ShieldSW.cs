@@ -357,16 +357,16 @@ namespace StarWarsShields
                 // CHECK IF REGISTERED YET, IF NOT AND INSTANCE EXISTS, REGISTER
                 if (_register == -1 && ShieldNetworking.Instance != null)
                 {
-                    Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
+                    // Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
                     _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent);
-                    ShieldNetworking.Instance.DumpTable();
+                    // ShieldNetworking.Instance.DumpTable();
                     if (_register == -1)
                     {
                         _register = ShieldNetworking.Instance.ReturnRegister(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key);
-                        Debug.Log("REGISTER PROCESS B - (HK SHIELDS) ");
+                        // Debug.Log("REGISTER PROCESS B - (HK SHIELDS) ");
                     }
 
-                    Debug.Log("REGISTER VALUE: (HK SHIELDS) " + _register);
+                    // Debug.Log("REGISTER VALUE: (HK SHIELDS) " + _register);
 
                 }
 
@@ -381,7 +381,7 @@ namespace StarWarsShields
                     if (ShieldNetworking.Instance.healthValue(_register) >= 0)
                     {
                         shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
-                        dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
+                        // dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
                     }
 
                     // <- SHIELD VFX NETWORKING ->
@@ -394,7 +394,7 @@ namespace StarWarsShields
                 }
                 else
                 {
-                    dA.LogLimited("SHIELD NOT YET REGISTERED (HK SHIELDS) !");
+                    // dA.LogLimited("SHIELD NOT YET REGISTERED (HK SHIELDS) !");
                 }
             }
 

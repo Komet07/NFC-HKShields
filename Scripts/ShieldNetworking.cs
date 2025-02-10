@@ -21,7 +21,7 @@ namespace StarWarsShields
             if (Instance == null)
             {
                 Instance = this;
-                Debug.Log("SHIELD NETWORKING INITIALIZED (HK SHIELDS) !");
+                // Debug.Log("SHIELD NETWORKING INITIALIZED (HK SHIELDS) !");
             }
         }
         #endregion
@@ -82,6 +82,7 @@ namespace StarWarsShields
             // REGISTER NEEDED RPCS
             RemoteCallHelper.RegisterRpcDelegate(typeof(ShieldNetworking), "RpcAddShieldTableEntry", new CmdDelegate(IRpcAddShieldTableEntry)); // ADD TABLE ENTRY TO SHIELD
             RemoteCallHelper.RegisterRpcDelegate(typeof(ShieldNetworking), "RpcUpdateShieldTable", new CmdDelegate(IRpcUpdateShieldTable)); // UPDATE SHIELD HEALTH
+            RemoteCallHelper.RegisterRpcDelegate(typeof(ShieldNetworking), "RpcAddVFXQueueEntry", new CmdDelegate(IRpcAddVFXQueueEntry)); // ADD VFX TO QUEUE
         }
             
         // <-- GENERAL NETWORKING FUNCTIONS -->
@@ -95,11 +96,11 @@ namespace StarWarsShields
 
             if (!isServer) // FAILSAFE FOR IF TRIGGERED AS CLIENT!
             {
-                Debug.Log("HT - THIS SHOULD BE THE CLIENT (HK SHIELDS)");
+                // Debug.Log("HT - THIS SHOULD BE THE CLIENT (HK SHIELDS)");
                 return index;
             }
 
-            Debug.Log("HT - THIS SHOULD BE THE HOST (HK SHIELDS)");
+            // Debug.Log("HT - THIS SHOULD BE THE HOST (HK SHIELDS)");
 
             // CHECK IF ENTRY EXISTS ALREADY
             for (int i = 0; i < _shieldTable.Count; i++)
@@ -152,12 +153,12 @@ namespace StarWarsShields
         {
             for (int i = 0; i < _shieldTable.Count; i++)
             {
-                Debug.Log("(HK SHIELDS) SHIELD TABLE ENTRY " + i + " - IDENT. 1: " + _shieldTable[i][0] + " - IDENT. 2: " + _shieldTable[i][1] + " - HEALTH: " + _shieldTable[i][2]);
+                // Debug.Log("(HK SHIELDS) SHIELD TABLE ENTRY " + i + " - IDENT. 1: " + _shieldTable[i][0] + " - IDENT. 2: " + _shieldTable[i][1] + " - HEALTH: " + _shieldTable[i][2]);
             }
 
             if (_shieldTable.Count == 0)
             {
-                Debug.Log("(HK SHIELDS) SHIELD TABLE IS EMPTY");
+                // Debug.Log("(HK SHIELDS) SHIELD TABLE IS EMPTY");
             }
         }
 
@@ -188,7 +189,7 @@ namespace StarWarsShields
             }
             else
             {
-                Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE! (HOST)");
+                // Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE! (HOST)");
             }
 
             if (!NetworkClient.active)
@@ -243,6 +244,28 @@ namespace StarWarsShields
             NetworkWriterPool.Recycle(writer);
         }
 
+        [ClientRpc(includeOwner = false)]
+        private void RpcAddVFXQueueEntry(object[] entry)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            // MAKE NEW WRITER
+            PooledNetworkWriter writer = NetworkWriterPool.GetWriter();
+
+            // WRITE NETWORKED VALUES
+            writer.WriteInt((int)entry[0]); // Index
+            writer.WriteInt((int)entry[1]); // Type
+            writer.WriteVector3((Vector3)entry[2]); // Position
+
+            // SEND RPC
+            SendRPCInternal(typeof(ShieldNetworking), "RpcAddVFXQueueEntry", writer, 0, false);
+
+            // RECYCLE WRITER
+            NetworkWriterPool.Recycle(writer);
+        }
+
         protected static void IRpcUpdateShieldTable(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
         {
             if (!NetworkClient.active)
@@ -259,6 +282,15 @@ namespace StarWarsShields
                 return;
             }
             ((ShieldNetworking)obj).UCRpcAddShieldTableEntry(reader.ReadString(), reader.ReadString(), reader.ReadFloat());
+        }
+
+        protected static void IRpcAddVFXQueueEntry(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            ((ShieldNetworking)obj).UCRpcAddVFXQueueEntry(reader.ReadInt(), reader.ReadInt(), reader.ReadVector3());
         }
 
         protected void UCRpcUpdateShieldTable(int i, float h)
@@ -280,6 +312,16 @@ namespace StarWarsShields
 
             DoRpcAddShieldTableEntry(c); // ADD NETWORKED ENTRY
         }
+        protected void UCRpcAddVFXQueueEntry(int a, int b, Vector3 h)
+        {
+            if (!NetworkClient.active)
+            {
+                return;
+            }
+            object[] c = { a, b, h };
+
+            DoRpcAddVFXQueueEntry(c); // ADD NETWORKED ENTRY
+        }
 
         void DoRpcUpdateShieldTable(int i, float _h)
         {
@@ -295,7 +337,7 @@ namespace StarWarsShields
             }
             else
             {
-                Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE!"); // LOG IF INDEX IS OUT OF BOUNDS OF TABLE
+                // Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE!"); // LOG IF INDEX IS OUT OF BOUNDS OF TABLE
             }
 
         }
@@ -312,7 +354,7 @@ namespace StarWarsShields
             }
             else
             {
-                Debug.Log("(HK SHIELDS) INDEX " + index + " WAS OUT OF BOUNDS OF SHIELD TABLE!");
+                // Debug.Log("(HK SHIELDS) INDEX " + index + " WAS OUT OF BOUNDS OF SHIELD TABLE!");
             }
 
             return _h;
@@ -343,8 +385,8 @@ namespace StarWarsShields
             RpcAddVFXQueueEntry(entry); // PASS ENTRY ALONG TO RPC
         }
 
-        [ClientRpc]
-        void RpcAddVFXQueueEntry(object[] entry)
+        
+        void DoRpcAddVFXQueueEntry(object[] entry)
         {
             if (isServer) // DO NOT ADD TO QUEUE IF ALREADY HOST - VFX HAS ALREADY PLAYED THERE
             {

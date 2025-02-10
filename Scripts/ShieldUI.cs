@@ -24,7 +24,7 @@ namespace StarWarsShields
 
         ModUtil _m = new ModUtil();
 
-        RateLimitedLogger dA = new RateLimitedLogger(1);
+        // RateLimitedLogger dA = new RateLimitedLogger(1);
 
 
         // INDEX SHIELD NETWORKING WITH REGISTER
@@ -57,7 +57,7 @@ namespace StarWarsShields
                     break;
             }
 
-            dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
+            // dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
 
             UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + ShieldNetworking.Instance.healthValue(_register) + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
 
