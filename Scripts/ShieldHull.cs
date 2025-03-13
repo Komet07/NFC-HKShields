@@ -86,7 +86,7 @@ namespace StarWarsShields
         [NonSerialized, ShipStat("shield-FragilityThreshold", "Shield Fragility Damage Threshold", "HP", InitializeFrom = "_fragileDamageThreshold", MinValue = 0f)]
         public StatValue statFragilityDamageThreshold;
 
-        [Header("Shield Color Library")]
+        [Header("Shield UI Color Library")]
         [Tooltip("IF HEALTH > 75% - QUICK NOTE ABOUT COLORBLIND ACCESSIBILITY: THESE COLORS WILL BE OVERRIDEN IF ANY FORM OF COLORBLIND ACCESSIBILITY IS IN!")]
         public Color ColorNominal = new Color(0.23f, 0.781f, 0.117f);
         [Tooltip("IF HEALTH > 50%")]
@@ -103,6 +103,10 @@ namespace StarWarsShields
         public Color ColorDisabled = new Color(0.275f, 0f, 0f);
         [Tooltip("IF SHIELD COMPONENT DESTROYED")]
         public Color ColorDestroyed = new Color(0.2f, 0.2f, 0.2f);
+
+        /* [Header("Shield VFX Color Library")]
+        [Tooltip("Color Gradient that gets applied onto the VFX based on shield health - the fraction of current health over max health represents the point where the color will be sampled from. TO USE: SET UP AN EXPOSED VECTOR4 PROPERTY NAMED '_healthColor'")]
+        public Gradient ColorVFX = new Gradient(); */
 
         //[SerializeField, Header("Shield Initialization")]
         // public ShieldNetworking _shieldNetworkingPrefab;

@@ -143,7 +143,7 @@ namespace StarWarsShields
                             Exception exception2 = exception1;
                             string str1 = (exception2 != null) ? exception2.ToString() : "";
                             
-                            Debug.Log(string.Concat("ERROR LOADING HK SHIELDS ASSET BUNDLE (HK SHIELDS) ! : ", str1));
+                            // Debug.Log(string.Concat("ERROR LOADING HK SHIELDS ASSET BUNDLE (HK SHIELDS) ! : ", str1));
                         }
 
                         
@@ -172,7 +172,7 @@ namespace StarWarsShields
                     }
                     else
                     {
-                        Debug.LogError("NO LOADED BUNDLES !!!");
+                        // Debug.LogError("NO LOADED BUNDLES !!!");
                     }
                 }
             }
@@ -185,7 +185,7 @@ namespace StarWarsShields
             }
             else
             {
-                Debug.LogError("SHIELD NETWORKING NOT FOUND IN ASSET BUNDLE (HK SHIELDS) !!! ");
+                // Debug.LogError("SHIELD NETWORKING NOT FOUND IN ASSET BUNDLE (HK SHIELDS) !!! ");
             }
                 
         }

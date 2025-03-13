@@ -174,6 +174,23 @@ namespace StarWarsShields
                     return; // CAN'T PLAY VFX IF VFX ISN'T THERE
                 }
 
+                // <-- GRADIENT SETUP - DETERMINE COLOR BASED ON SHIELD HEALTH FRACTION -->
+                /* Gradient _g = shieldHullClass.ColorVFX;
+                float a = (float)(shieldHullClass.shieldIntegrityCurrent / shieldHullClass.statShieldIntegrityMax.Value);
+                Color b = _g.Evaluate(a);
+                Gradient _u = new Gradient();
+
+                // <- SET UP NEW GRADIENT KEYS ->
+                var colors = new GradientColorKey[2];
+                colors[0] = new GradientColorKey(b, 0.0f);
+                colors[1] = new GradientColorKey(b, 1.0f);
+
+                var alphas = new GradientAlphaKey[2];
+                alphas[0] = new GradientAlphaKey(1.0f, 0.0f);
+                alphas[1] = new GradientAlphaKey(1.0f, 1.0f);
+
+                _u.SetKeys(colors, alphas); */
+
                 // SETUP VFX OBJECT
                 GameObject _vfxParent = new GameObject();
 
@@ -182,9 +199,14 @@ namespace StarWarsShields
                 // GRAB VFX ASSET
                 VisualEffect _vfx2 = _vfxParent.AddComponent<VisualEffect>();
                 _vfx2.visualEffectAsset = _vfx.visualEffectAsset;
-
                 _vfxParent.transform.position = _pos;
 
+                // ASSIGN GRADIENT COLOR TO VFX - ONLY DO SO IF THE VFX HAS AN APPROPRIATE PROPERTY
+                /* if (_vfx2.HasGradient("_healthColor"))
+                {
+                    _vfx2.SetGradient("_healthColor", _u);
+                } */
+                    
 
                 // DETERMINE VIEW DIRECTION THROUGH SHENANIGANS
                 transform.localScale = shieldHullClass.GetBoundingVolumeSize * (scaleFactor - 0.02f) * 2;
@@ -305,6 +327,11 @@ namespace StarWarsShields
                 return false;
             }
 
+            if (!CM.CanCarryCraft) // FAILSAFE FOR SHIPS THAT CAN'T ACTUALLY LAUNCH FIGHTERS
+            {
+                return false;
+            }
+
             if (CM.LaunchingCount > 0 || CM.LandingCount > 0)
             {
                 return true; // RETURN TRUE IF CRAFT ARE LAUNCHING OR LANDING
@@ -361,9 +388,9 @@ namespace StarWarsShields
                     shieldHullClass.shieldIntegrityCurrent = Mathf.Round(shieldHullClass.shieldIntegrityCurrent * 20) / 20;
                 }
 
-                csdd_counter = (CarrierOps()) ? CraftShieldDownDelay : Mathf.Clamp((csdd_counter - Time.deltaTime), 0f, CraftShieldDownDelay);
+                csdd_counter = CarrierOps() ? CraftShieldDownDelay : Mathf.Clamp((csdd_counter - Time.deltaTime), 0f, CraftShieldDownDelay);
 
-                bool _active = shieldHullClass.shieldIntegrityCurrent > 0 ? ((csdd_counter > 0f) ? true : false) : false;
+                bool _active = shieldHullClass.shieldIntegrityCurrent > 0 ? (csdd_counter > 0f ? false : true) : false;
 
 
                 // Disable Shield Scaler & Collider if not active & vice versa
@@ -391,16 +418,16 @@ namespace StarWarsShields
                 // CHECK IF REGISTERED YET, IF NOT AND INSTANCE EXISTS, REGISTER
                 if (_register == -1 && ShieldNetworking.Instance != null)
                 {
-                    // Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
+                    Debug.Log("REGISTER PROCESS A - (HK SHIELDS) ");
                     _register = ShieldNetworking.Instance.DoRegisterShieldTable(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key, shieldHullClass.shieldIntegrityCurrent);
-                    // ShieldNetworking.Instance.DumpTable();
+                    ShieldNetworking.Instance.DumpTable();
                     if (_register == -1)
                     {
                         _register = ShieldNetworking.Instance.ReturnRegister(shieldHullClass.Socket.MyHull.MyShip.netId.ToString(), shieldHullClass.Socket.Key);
-                        // Debug.Log("REGISTER PROCESS B - (HK SHIELDS) ");
+                        Debug.Log("REGISTER PROCESS B - (HK SHIELDS) ");
                     }
 
-                    // Debug.Log("REGISTER VALUE: (HK SHIELDS) " + _register);
+                    Debug.Log("REGISTER VALUE: (HK SHIELDS) " + _register);
 
                 }
 
@@ -415,7 +442,7 @@ namespace StarWarsShields
                     if (ShieldNetworking.Instance.healthValue(_register) >= 0)
                     {
                         shieldHullClass.shieldIntegrityCurrent = ShieldNetworking.Instance.healthValue(_register);
-                        // dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register));
+                        //dA.LogLimited("CURRENT HEALTH VALUE: (HK SHIELDS - SHIELD SW) " + shieldHullClass.Socket.MyHull.MyShip.ShipDisplayName + " - " + ShieldNetworking.Instance.healthValue(_register) + " - COLLIDER IS CURRENTLY: " + ((_active) ? "ON" : "OFF") + " - CARRIER OPS: " + ((csdd_counter > 0) ? "Y" : "N"));
                     }
 
                     // <- SHIELD VFX NETWORKING ->

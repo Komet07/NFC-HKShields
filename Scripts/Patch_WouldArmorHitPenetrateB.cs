@@ -14,7 +14,7 @@ namespace StarWarsShields
     [HarmonyPatch]
     internal class Patch_WouldArmorHitPenetrateB 
     {
-        [HarmonyTargetMethod]
+        /* [HarmonyTargetMethod]
         private static MethodBase TargetMethod()
         {
             return (from method in AccessTools.GetDeclaredMethods(typeof(ShipController))
@@ -52,6 +52,6 @@ namespace StarWarsShields
             }
 
             return true;
-        }
+        } */
     }
 }
