@@ -20,7 +20,7 @@ namespace StarWarsShields
         private Image _iconImage = null;
 
         [SerializeField]
-        public ShieldSW _s;
+        public ShieldSW[] _s;
 
         ModUtil _m = new ModUtil();
 
@@ -30,20 +30,109 @@ namespace StarWarsShields
 
 
         // INDEX SHIELD NETWORKING WITH REGISTER
-        private int _register = -1;
+        public int[] _register = {};
+
+        float ReturnShieldHealthMax(int i) {
+            return ShieldNetworking.Instance.healthValue(_register[i]);
+        }
+
+        float ReturnShieldHealthCurrent(ShieldSW s) {
+            return s.shieldHullClass.statShieldIntegrityMax.Value;
+        }
+
+        bool AllRegistered() {
+            for (int i = 0; i < _s.Length; i++) {
+                if (_register.Length <= i || _register[i] == -1) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool AllDestroyed() {
+            for (int i = 0; i < _s.Length; i++) {
+                if (_s[i].shieldHullClass.GetActivityStatus() != ComponentActivity.Destroyed) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool AllDisabled() {
+            for (int i = 0; i < _s.Length; i++) {
+                if (_s[i].shieldHullClass.GetActivityStatus() != ComponentActivity.Disabled) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        string ReturnShieldText(int i, float _mH, float _cH) {
+            string _t = "";
+
+            if (_s.Length > 0) {
+                _t = "(Shield " + i + ")";
+            }
+
+            ComponentActivity _a = ComponentActivity.Active;
+            string _tActivity = "";
+
+            if (_register[i] != -1 && ShieldNetworking.Instance != null)
+            {
+                _a = _s[i].shieldHullClass.GetActivityStatus();
+            }
+
+            switch (_a)
+            {
+                /* case ComponentActivity.MissingResource:
+                    _tActivity = "<color=red>NO POWER</color>";
+                    break; */
+                case ComponentActivity.Destroyed:
+                    _tActivity = "<color=red>DESTROYED</color>";
+                    break;
+                case ComponentActivity.Disabled:
+                    _tActivity = "<color=red>DISABLED</color>";
+                    break;
+                default:
+                    _tActivity = "";
+                    break;
+            }
+
+            if (_cH == 0 && _tActivity == "")
+            {
+                _tActivity = "<color=red>NO HEALTH</color>";
+
+            }
+
+            _t += ("Integrity: " + Mathf.Round(_cH / _mH) * 100).ToString() + "% (" + _cH + " HP / " + _s[i].shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "(" + _tActivity + ")" : "");
+
+            return _t;
+        }
 
         public void FixedUpdate()
         {
+            
 
-            if (_s == null)
+            if (_s == null || _s.Length == 0 || _s[0] == null) // Safeguards so this doesn't run while not all shields are registered
             {
                 return;
             }
 
+            if (!AllRegistered()) {
+                for (int i = 0; i < _s.Length; i++) {
+                    if (_register[i] == -1 && _s[i]._register != -1)
+                    {
+                        _register[i] = _s[i]._register;
+                    }
+                }
+                return;
+            }
+
+
             if (_shieldColorLibrary == null)
             {
-                _shieldColorLibrary = new Color[] { _s.shieldHullClass.ColorNominal, _s.shieldHullClass.ColorLightDamage, _s.shieldHullClass.ColorModerateDamage, _s.shieldHullClass.ColorHeavyDamage, _s.shieldHullClass.ColorVeryHeavyDamage, _s.shieldHullClass.ColorNoHealth, _s.shieldHullClass.ColorDisabled, _s.shieldHullClass.ColorDestroyed };
-
+                _shieldColorLibrary = new Color[] { _s[0].shieldHullClass.ColorNominal, _s[0].shieldHullClass.ColorLightDamage, _s[0].shieldHullClass.ColorModerateDamage, _s[0].shieldHullClass.ColorHeavyDamage, _s[0].shieldHullClass.ColorVeryHeavyDamage, _s[0].shieldHullClass.ColorNoHealth, _s[0].shieldHullClass.ColorDisabled, _s[0].shieldHullClass.ColorDestroyed }; // Colored Library works off of the first shield's color palette
+                
                 // <-- CHECK FOR COLORBLIND ACCESSIBILITY: --> (+ Override if different palette used than regularly)
                 Color[] _standards = new Color[] { new Color(0.23f, 0.781f, 0.117f), new Color(0.824f, 0.816f, 0.121f), new Color(0.968f, 0.396f, 0.105f), new Color(0.929f, 0.128f, 0.113f)};
 
@@ -73,50 +162,52 @@ namespace StarWarsShields
                 }
             }
 
-            float _val = _s.shieldHullClass.shieldIntegrityCurrent / _s.shieldHullClass.statShieldIntegrityMax.Value;
-            ComponentActivity _a = ComponentActivity.Active;
-            string _tActivity = "";
+            float[] mHealth = new float[_s.Length];
+            float[] cHealth = new float[_s.Length];
 
-            if (_register != -1 && ShieldNetworking.Instance != null)
-            {
-                _a = _s.shieldHullClass.GetActivityStatus();
+            float _totalMHealth = 0;
+            float _totalCHealth = 0;
+
+            for (int i = 0; i < _s.Length; i++) {
+                mHealth[i] = ReturnShieldHealthMax(i);
+                cHealth[i] = ReturnShieldHealthCurrent(_s[i]);
+
+                _totalMHealth += mHealth[i];
+                _totalCHealth += cHealth[i];
             }
 
-            switch (_a)
-            {
-                /* case ComponentActivity.MissingResource:
-                    _tActivity = "<color=red>NO POWER</color>";
-                    break; */
-                case ComponentActivity.Destroyed:
-                    _tActivity = "<color=red>DESTROYED</color>";
-                    break;
-                case ComponentActivity.Disabled:
-                    _tActivity = "<color=red>DISABLED</color>";
-                    break;
-                default:
-                    _tActivity = "";
-                    break;
+
+
+            float _val = _totalMHealth / _totalCHealth;
+
+            // Write Tooltip Text
+            string _tooltip = "";
+            if (_s.Length > 0) {
+                _tooltip += "Total Integrity: "+ Mathf.Round(_val*100).ToString() + "% (" + _totalCHealth + " HP / " + _totalMHealth + " HP)";
             }
 
-            if (_s.shieldHullClass.shieldIntegrityCurrent == 0 && _tActivity == "")
-            {
-                _tActivity = "<color=red>NO HEALTH</color>";
-
+            for (int i = 0; i < _s.Length; i++) {
+                _tooltip += "\n";
+                _tooltip += ReturnShieldText(i, mHealth[i], cHealth[i]);
             }
+
+
+            
+
+            
 
             //dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
 
-            UpdateTooltipText("Integrity: " + Mathf.Round(_val*100).ToString() + "% (" + ShieldNetworking.Instance.healthValue(_register) + " HP / " + _s.shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "\n" + _tActivity : ""));
+            UpdateTooltipText(_tooltip);
 
-            if (_register == -1 && _s._register != -1)
-            {
-                _register = _s._register;
-            }
+            
+                
+                
 
             if (_iconImage != null)
             {
 
-                if (_s.shieldHullClass.shieldIntegrityCurrent == 0)
+                if (_totalCHealth == 0)
                 {
                     _iconImage.color = _shieldColorLibrary[5];
 
@@ -143,27 +234,21 @@ namespace StarWarsShields
                 }
 
 
-               
-
-                switch (_a)
+                if (AllDestroyed())
                 {
-                    /* case ComponentActivity.MissingResource:
-                        _iconImage.color = GameColors.Purple;
-                        break; */
-                    case ComponentActivity.Destroyed:
-                        _iconImage.color = _shieldColorLibrary[7];
-                        break;
-                    case ComponentActivity.Disabled:
-                        _iconImage.color = _shieldColorLibrary[6];
-                        break;
+                    _iconImage.color = _shieldColorLibrary[7];
+                }
+                else if (AllDisabled())
+                {
+                    _iconImage.color = _shieldColorLibrary[6];
                 }
             }
-            else if (_s._shieldIcon != null)
+            else if (_s[0]._shieldIcon != null)
             {
                 
                 _iconImage = (Image)_graphic;
 
-                _iconImage.sprite = _s._shieldIcon;
+                _iconImage.sprite = _s[0]._shieldIcon;
                 _graphic = _iconImage;
             }
 

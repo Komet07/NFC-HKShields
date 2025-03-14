@@ -10,6 +10,7 @@ using Game.UI;
 using Game.Units;
 using Ships;
 using UI;
+using QuickGraph.Serialization;
 
 namespace StarWarsShields
 {
@@ -25,15 +26,17 @@ namespace StarWarsShields
             Debug.Log("(HK SHIELDS) HARMONY PATCH IS RUNNING!");
             bool _a = false;
 
-            ShieldSW shield = null;
+            ShieldSW[] shield = null;
+            int[] r = null;
             ModUtil _mod = new ModUtil();
             foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(ship.Ship.Hull.AllComponents))
             {
                 _a = true;
                 ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
-                shield = _s;
-                Debug.Log("(HK SHIELDS - SHIELD UI INITIALIZATION) FOUND SHIELD : " + ship.Ship.ShipDisplayName + " - AT SOCKET: " + _s1.Socket.Key);
-                break;
+                shield.AddItem(_s);
+                r.AddItem(-1);
+                Debug.Log("(HK SHIELDS - SHIELD UI INITIALIZATION) FOUND SHIELD : " + ship.Ship.ShipDisplayName + " - AT SOCKET: " + _s1.Socket.Key + " - Shield : " + shield.Length);
+                continue;
             }
 
             Debug.Log("(HK SHIELDS) PATCH FLAG 1 : " + _a);
@@ -60,6 +63,7 @@ namespace StarWarsShields
 
                 ShieldUI _sUI = newObject.AddComponent<ShieldUI>();
                 _sUI._s = shield;
+                _sUI._register = r;
 
                 _mod.SetPrivateField(_sUI, "_showWhenNormal", true);
 
