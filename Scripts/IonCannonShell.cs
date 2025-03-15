@@ -46,6 +46,12 @@ namespace StarWarsShields
 			this._attachedToAtImpact = null;
 			return hitResult == HitResult.Penetrated || hitResult == HitResult.Stopped || hitResult == HitResult.Ricochet;
 		}
+
+		protected override string GetDamageStatsText()
+		{
+			string str = string.Concat(base.GetDamageStatsText(), string.Format("Ion Damage Multiplier: {0}\n", _shieldDamageMultiplier));
+			return str;
+		}
 	}
 }
     

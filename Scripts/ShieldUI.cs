@@ -70,7 +70,7 @@ namespace StarWarsShields
         string ReturnShieldText(int i, float _mH, float _cH) {
             string _t = "";
 
-            if (_s.Length > 0) {
+            if (_s.Length > 1) {
                 _t = "(Shield " + i + ")";
             }
 
@@ -182,12 +182,12 @@ namespace StarWarsShields
 
             // Write Tooltip Text
             string _tooltip = "";
-            if (_s.Length > 0) {
+            if (_s.Length > 1) {
                 _tooltip += "Total Integrity: "+ Mathf.Round(_val*100).ToString() + "% (" + _totalCHealth + " HP / " + _totalMHealth + " HP)";
             }
 
             for (int i = 0; i < _s.Length; i++) {
-                _tooltip += "\n";
+                _tooltip += (_s.Length != 1) ? "\n" : "";
                 _tooltip += ReturnShieldText(i, mHealth[i], cHealth[i]);
             }
 
