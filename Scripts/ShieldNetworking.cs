@@ -121,7 +121,7 @@ namespace StarWarsShields
                 _shieldTable.Add(_a);
             }
 
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return index;
             }
@@ -192,7 +192,7 @@ namespace StarWarsShields
                 // Debug.Log("(HK SHIELDS) INDEX " + i + " WAS OUT OF BOUNDS OF SHIELD TABLE! (HOST)");
             }
 
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
