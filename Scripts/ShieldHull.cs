@@ -224,6 +224,7 @@ namespace StarWarsShields
 
             rows.Add(statShieldIntegrityMax.FullTextWithLinkRow);
             rows.Add(statShieldThreshold.FullTextWithLinkRow);
+            rows.Add(("Damage Threshold subtracted from damage", subtractDT ? "Yes" : "No"));
             rows.Add(statShieldResistance.FullTextWithLinkRow);
             rows.Add(statRechargeRate.FullTextWithLinkRow);
             rows.Add(statRechargeDelay.FullTextWithLinkRow);
