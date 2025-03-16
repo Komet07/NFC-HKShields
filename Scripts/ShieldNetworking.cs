@@ -165,7 +165,7 @@ namespace StarWarsShields
         // ADD NEW ENTRY TO Shield Table
         void DoRpcAddShieldTableEntry(object[] entry)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -204,7 +204,7 @@ namespace StarWarsShields
         [ClientRpc(includeOwner = false)]
         private void RpcUpdateShieldTable(int index, float health)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -225,7 +225,7 @@ namespace StarWarsShields
         [ClientRpc(includeOwner = false)]
         private void RpcAddShieldTableEntry(object[] entry)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -247,7 +247,7 @@ namespace StarWarsShields
         [ClientRpc(includeOwner = false)]
         private void RpcAddVFXQueueEntry(object[] entry)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -268,7 +268,7 @@ namespace StarWarsShields
 
         protected static void IRpcUpdateShieldTable(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -277,7 +277,7 @@ namespace StarWarsShields
 
         protected static void IRpcAddShieldTableEntry(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -286,7 +286,7 @@ namespace StarWarsShields
 
         protected static void IRpcAddVFXQueueEntry(NetworkBehaviour obj, NetworkReader reader, NetworkConnectionToClient senderConnection)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -295,7 +295,7 @@ namespace StarWarsShields
 
         protected void UCRpcUpdateShieldTable(int i, float h)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -304,7 +304,7 @@ namespace StarWarsShields
 
         protected void UCRpcAddShieldTableEntry(string a, string b, float h)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -314,7 +314,7 @@ namespace StarWarsShields
         }
         protected void UCRpcAddVFXQueueEntry(int a, int b, Vector3 h)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
@@ -325,7 +325,7 @@ namespace StarWarsShields
 
         void DoRpcUpdateShieldTable(int i, float _h)
         {
-            if (!NetworkClient.active)
+            if (!NetworkClient.active && !NetworkServer.active)
             {
                 return;
             }
