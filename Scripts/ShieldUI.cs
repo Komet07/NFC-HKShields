@@ -20,7 +20,7 @@ namespace StarWarsShields
         private Image _iconImage = null;
 
         [SerializeField]
-        public ShieldSW[] _s;
+        public List<ShieldSW> _s = new List<ShieldSW>();
 
         ModUtil _m = new ModUtil();
 
@@ -30,7 +30,7 @@ namespace StarWarsShields
 
 
         // INDEX SHIELD NETWORKING WITH REGISTER
-        public int[] _register = {};
+        public List<int> _register = new List<int>();
 
         float ReturnShieldHealthMax(int i) {
             return ShieldNetworking.Instance.healthValue(_register[i]);
@@ -41,8 +41,8 @@ namespace StarWarsShields
         }
 
         bool AllRegistered() {
-            for (int i = 0; i < _s.Length; i++) {
-                if (_register.Length <= i || _register[i] == -1) {
+            for (int i = 0; i < _s.Count; i++) {
+                if (_register.Count <= i || _register[i] == -1) {
                     return false;
                 }
             }
@@ -50,7 +50,7 @@ namespace StarWarsShields
         }
 
         bool AllDestroyed() {
-            for (int i = 0; i < _s.Length; i++) {
+            for (int i = 0; i < _s.Count; i++) {
                 if (_s[i].shieldHullClass.GetActivityStatus() != ComponentActivity.Destroyed) {
                     return false;
                 }
@@ -59,7 +59,7 @@ namespace StarWarsShields
         }
 
         bool AllDisabled() {
-            for (int i = 0; i < _s.Length; i++) {
+            for (int i = 0; i < _s.Count; i++) {
                 if (_s[i].shieldHullClass.GetActivityStatus() != ComponentActivity.Disabled) {
                     return false;
                 }
@@ -70,7 +70,7 @@ namespace StarWarsShields
         string ReturnShieldText(int i, float _mH, float _cH) {
             string _t = "";
 
-            if (_s.Length > 1) {
+            if (_s.Count > 1) {
                 _t = "(Shield " + i + ")";
             }
 
@@ -113,13 +113,13 @@ namespace StarWarsShields
         {
             
 
-            if (_s == null || _s.Length == 0 || _s[0] == null) // Safeguards so this doesn't run while not all shields are registered
+            if (_s == null || _s.Count == 0 || _s[0] == null) // Safeguards so this doesn't run while not all shields are registered
             {
                 return;
             }
 
             if (!AllRegistered()) {
-                for (int i = 0; i < _s.Length; i++) {
+                for (int i = 0; i < _s.Count; i++) {
                     if (_register[i] == -1 && _s[i]._register != -1)
                     {
                         _register[i] = _s[i]._register;
@@ -162,13 +162,13 @@ namespace StarWarsShields
                 }
             }
 
-            float[] mHealth = new float[_s.Length];
-            float[] cHealth = new float[_s.Length];
+            float[] mHealth = new float[_s.Count];
+            float[] cHealth = new float[_s.Count];
 
             float _totalMHealth = 0;
             float _totalCHealth = 0;
 
-            for (int i = 0; i < _s.Length; i++) {
+            for (int i = 0; i < _s.Count; i++) {
                 mHealth[i] = ReturnShieldHealthMax(i);
                 cHealth[i] = ReturnShieldHealthCurrent(_s[i]);
 
@@ -182,12 +182,12 @@ namespace StarWarsShields
 
             // Write Tooltip Text
             string _tooltip = "";
-            if (_s.Length > 1) {
+            if (_s.Count > 1) {
                 _tooltip += "Total Integrity: "+ Mathf.Round(_val*100).ToString() + "% (" + _totalCHealth + " HP / " + _totalMHealth + " HP)";
             }
 
-            for (int i = 0; i < _s.Length; i++) {
-                _tooltip += (_s.Length != 1) ? "\n" : "";
+            for (int i = 0; i < _s.Count; i++) {
+                _tooltip += (_s.Count != 1) ? "\n" : "";
                 _tooltip += ReturnShieldText(i, mHealth[i], cHealth[i]);
             }
 

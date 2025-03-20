@@ -24,15 +24,15 @@ namespace StarWarsShields
         {
             bool _a = false;
             ModUtil _mod = new ModUtil();
-            ShieldSW[] shield = null;
-            int[] r = null;
+             List<ShieldSW> shield = new List<ShieldSW>();
+            List<int> r = new List<int>();
             foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(ship.Ship.Hull.AllComponents))
             {
                 _a = true;
                 ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
-                shield.AddItem(_s);
-                r.AddItem(-1);
-                Debug.Log("(HK SHIELDS - SHIELD UI INITIALIZATION) FOUND SHIELD : " + ship.Ship.ShipDisplayName + " - AT SOCKET: " + _s1.Socket.Key + " - Shield : " + shield.Length);
+                shield.Add(_s);
+                r.Add(-1);
+                Debug.Log("(HK SHIELDS - SHIELD UI INITIALIZATION) FOUND SHIELD : " + ship.Ship.ShipDisplayName + " - AT SOCKET: " + _s1.Socket.Key + " - Shield : " + shield.Count);
                 continue;
             }
 
