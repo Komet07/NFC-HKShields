@@ -24,7 +24,7 @@ namespace StarWarsShields
         {
             bool _a = false;
             ModUtil _mod = new ModUtil();
-             List<ShieldSW> shield = new List<ShieldSW>();
+            List<ShieldSW> shield = new List<ShieldSW>();
             List<int> r = new List<int>();
             foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(ship.Ship.Hull.AllComponents))
             {

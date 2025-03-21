@@ -104,7 +104,7 @@ namespace StarWarsShields
 
             }
 
-            _t += ("Integrity: " + Mathf.Round(_cH / _mH) * 100).ToString() + "% (" + _cH + " HP / " + _s[i].shieldHullClass.statShieldIntegrityMax.Value + " HP)" + ((_tActivity != "") ? "(" + _tActivity + ")" : "");
+            _t += ("Integrity: " + Mathf.Round(_cH / _mH) * 100).ToString() + "% (" + _cH + " HP / " + _mH + " HP)" + ((_tActivity != "") ? "(" + _tActivity + ")" : "");
 
             return _t;
         }
@@ -113,12 +113,14 @@ namespace StarWarsShields
         {
             
 
-            if (_s == null || _s.Count == 0 || _s[0] == null) // Safeguards so this doesn't run while not all shields are registered
+            if (_s.Count == 0 || _s[0] == null) // Safeguards so this doesn't run while not all shields are registered
             {
+                dA.LogLimited("(HK SHIELDS) SHIELD UI - NO SHIELDS PRESENT?");
                 return;
             }
 
             if (!AllRegistered()) {
+                dA.LogLimited("(HK SHIELDS) SHIELD UI - NOT ALL SHIELDS REGISTERED");
                 for (int i = 0; i < _s.Count; i++) {
                     if (_register[i] == -1 && _s[i]._register != -1)
                     {
@@ -162,18 +164,18 @@ namespace StarWarsShields
                 }
             }
 
-            float[] mHealth = new float[_s.Count];
-            float[] cHealth = new float[_s.Count];
+            List<float> mHealth = new List<float>();
+            List<float> cHealth = new List<float>();
 
             float _totalMHealth = 0;
             float _totalCHealth = 0;
 
             for (int i = 0; i < _s.Count; i++) {
-                mHealth[i] = ReturnShieldHealthMax(i);
-                cHealth[i] = ReturnShieldHealthCurrent(_s[i]);
+                mHealth.Add(ReturnShieldHealthMax(i));
+                cHealth.Add(ReturnShieldHealthCurrent(_s[i]));
 
-                _totalMHealth += mHealth[i];
-                _totalCHealth += cHealth[i];
+                _totalMHealth += mHealth[mHealth.Count - 1];
+                _totalCHealth += cHealth[cHealth.Count - 1];
             }
 
 
@@ -196,7 +198,7 @@ namespace StarWarsShields
 
             
 
-            //dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + ShieldNetworking.Instance.healthValue(_register) + " HP");
+            dA.LogLimited("(HK SHIELDS - " + ((ShieldNetworking.Instance.isServer) ? "HOST" : "CLIENT") + ") CURRENT UI REGISTER : " + _register + " - CURRENT SHIELD HEALTH VALUE: " + _totalCHealth + " HP");
 
             UpdateTooltipText(_tooltip);
 

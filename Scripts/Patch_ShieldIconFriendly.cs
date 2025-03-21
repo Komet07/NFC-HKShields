@@ -40,6 +40,8 @@ namespace StarWarsShields
             }
 
             Debug.Log("(HK SHIELDS) PATCH FLAG 1 : " + _a);
+            Debug.Log("(HK SHIELDS) PATCH FLAG 2 : " + shield.Count);
+            Debug.Log("(HK SHIELDS) PATCH FLAG 3 : " + r.Count);
 
             if (_a)
             {

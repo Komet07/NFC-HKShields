@@ -119,6 +119,10 @@ namespace StarWarsShields
             if (isServerOnly)
             {
                 _shieldTable.Add(_a);
+
+                RpcAddShieldTableEntry(_a);
+
+                return index;
             }
 
             if (!NetworkClient.active && !NetworkServer.active)
