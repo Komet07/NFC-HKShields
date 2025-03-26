@@ -32,11 +32,11 @@ namespace StarWarsShields
         // INDEX SHIELD NETWORKING WITH REGISTER
         public List<int> _register = new List<int>();
 
-        float ReturnShieldHealthMax(int i) {
+        float ReturnShieldHealthCurrent(int i) {
             return ShieldNetworking.Instance.healthValue(_register[i]);
         }
 
-        float ReturnShieldHealthCurrent(ShieldSW s) {
+        float ReturnShieldHealthMax(ShieldSW s) {
             return s.shieldHullClass.statShieldIntegrityMax.Value;
         }
 
@@ -171,8 +171,8 @@ namespace StarWarsShields
             float _totalCHealth = 0;
 
             for (int i = 0; i < _s.Count; i++) {
-                mHealth.Add(ReturnShieldHealthMax(i));
-                cHealth.Add(ReturnShieldHealthCurrent(_s[i]));
+                mHealth.Add(ReturnShieldHealthMax(_s[i]));
+                cHealth.Add(ReturnShieldHealthCurrent(i));
 
                 _totalMHealth += mHealth[mHealth.Count - 1];
                 _totalCHealth += cHealth[cHealth.Count - 1];
