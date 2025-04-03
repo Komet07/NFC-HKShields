@@ -45,6 +45,18 @@ namespace StarWarsShields
 
         private static bool Prefix(ShipController __instance, MunitionHitInfo hitInfo, IDamageDealer damager)
         {
+
+            // CHECK FOR DEFENSIVE-ONLY AOE EFFECT
+            if (damager.GetType() == typeof(AOEExplosionEffectModule))
+            {
+                ModUtil _mod = new ModUtil();
+                if ((bool)_mod.GetPrivateField(damager, "_munitionsOnly") == true)
+                {
+                    
+                    return true;
+                }
+            }
+
             foreach (ShieldHull _s1 in Enumerable.OfType<ShieldHull>(__instance.Ship.Hull.AllComponents))
             {
                 ShieldSW _s = _s1.gameObject.GetComponent<ShieldSW>();
