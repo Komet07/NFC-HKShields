@@ -18,6 +18,7 @@ using Game;
 
 
 using Ships.Serialization;
+using System.Linq;
 
 
 
@@ -72,6 +73,8 @@ namespace StarWarsShields
 
         public ShieldHull shieldHullClass;
 
+        ModUtil _mod = new ModUtil();
+
         public float tPassedSinceLastDamage = 0;
 
         RateLimitedLogger dA = new RateLimitedLogger(1);
@@ -81,6 +84,8 @@ namespace StarWarsShields
 
         [NonSerialized]
         public IDamageDealer _damager;
+
+        
 
         /* [SyncVar(hook = nameof(InitHook))] */
         protected bool _hasInitialized = false;
@@ -334,9 +339,12 @@ namespace StarWarsShields
 
             if (CM.LaunchingCount > 0 || CM.LandingCount > 0)
             {
-                return true; // RETURN TRUE IF CRAFT ARE LAUNCHING OR LANDING
+                return true; // RETURN TRUE IF CRAFT ARE ACTIVELY LAUNCHING OR LANDING
             }
-
+            List<object> _l = (List<object>)_mod.GetPrivateField(CM, "_trafficQueue");
+            if (_l.Count > 0) {
+                return true; // RETURN CRAFT IF TRAFFIC QUEUE IS NOT EMPTY
+            }
 
             return false; // DO NOT LOWER SHIELD
         }
@@ -387,6 +395,8 @@ namespace StarWarsShields
                     shieldHullClass.shieldIntegrityCurrent = Mathf.Clamp(shieldHullClass.shieldIntegrityCurrent, 0, shieldHullClass.statShieldIntegrityMax.Value);
                     shieldHullClass.shieldIntegrityCurrent = Mathf.Round(shieldHullClass.shieldIntegrityCurrent * 20) / 20;
                 }
+
+                shieldHullClass.shieldIntegrityCurrent = Mathf.Clamp(shieldHullClass.shieldIntegrityCurrent, 0, shieldHullClass.statShieldIntegrityMax.Value);
 
                 csdd_counter = CarrierOps() ? CraftShieldDownDelay : Mathf.Clamp((csdd_counter - Time.deltaTime), 0f, CraftShieldDownDelay);
 
